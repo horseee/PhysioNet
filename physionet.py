@@ -5,6 +5,7 @@ import numpy as np
 from scipy.io import loadmat
 
 def load_physionet(dir_path, test=0.2,vali=0, shuffle=True):
+    "return train_X, train_y, test_X, test_y, valid_X, valid_y"
     if dir_path[-1]!='/': dir_path = dir_path+'/'
     ref = pd.read_csv(dir_path+'REFERENCE.csv',header=None)
     label_id = {'N':0, 'A':1, 'O':2, '~':3 }#Normal, AF, Other, Noisy
@@ -20,7 +21,14 @@ def load_physionet(dir_path, test=0.2,vali=0, shuffle=True):
         file_prefix = row[0]
         mat_file = dir_path+file_prefix+'.mat'
         hea_file = dir_path+file_prefix+'.hea'
-        X.append( loadmat(mat_file)['val'][0] )
+        data = loadmat(mat_file)['val']
+
+        data = data.squeeze()
+        data = np.nan_to_num(data)
+        data = data-np.mean(data)
+        data = data/np.std(data)
+
+        X.append( data )
         y.append( label_id[row[1]] )
         
     X = np.array(X)
@@ -48,5 +56,5 @@ def load_physionet(dir_path, test=0.2,vali=0, shuffle=True):
         X = X[valid_n+test_n: ]
         y = y[valid_n+test_n: ]
         
-    print('Train: %d, Test: %d, Validation: %d   (%s)'%((data_n-valid_n-test_n), test_n, valid_n, 'shuffled' if shuffle else 'unshuffled'))
+    #print('Train: %d, Test: %d, Validation: %d   (%s)'%((data_n-valid_n-test_n), test_n, valid_n, 'shuffled' if shuffle else 'unshuffled'))
     return np.squeeze(X), np.squeeze(y), np.squeeze(test_X), np.squeeze(test_y), np.squeeze(valid_X), np.squeeze(valid_y)
