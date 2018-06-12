@@ -28,7 +28,7 @@ def to_one_hot(y, class_num=4):
         return y_onehot
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--learning_rate',type=float,default=0.0000001,help='learning rate')
+parser.add_argument('--learning_rate',type=float,default=0.0000000001,help='learning rate')
 parser.add_argument('--epochs',type=int,default=3000,help='epoch number')
 parser.add_argument('--ckpt',type=str,default='checkpoints/model',help='epoch number')
 parser.add_argument('--batch_size',type=int,default=16,help='batch size')
@@ -77,8 +77,10 @@ sess.run(tf.global_variables_initializer())
 saver =  tf.train.Saver(tf.global_variables())
 
 try:
-    saver.restore(sess, args.ckpt)
-    print('Model restored from %s'%(args.ckpt))
+    if os.path.exists('checkpoints'):
+        saver.restore(sess, args.ckpt)
+        print('Model restored from %s'%(args.ckpt))
+    else: print('Restore failed, training new model!')
 except: print('Restore failed, training new model!')
 
 batch_size = args.batch_size
@@ -105,10 +107,9 @@ for ep in range(epochs+1):
         #    print('   iter %d, loss = %f'%(itr, cur_loss))
         #    saver.save(sess, args.ckpt)
     print('[*] epoch %d, average loss = %f'%(ep, np.mean(total_loss)))
-    total_loss=[]
     saver.save(sess, args.ckpt)
 
-        # validation
+    # validation
     if ep%5==0: #and ep!=0:
         err = 0
         for i in range(valid_n):
