@@ -5,8 +5,8 @@ def ResNet(inputs, class_num=4):
     conv_strides = 1
     conv_filters = 64
     dropout_rate = 0.5
-    pool_size = 4
-    pool_strides = 4
+    pool_size = 2
+    pool_strides = 2
 
     def _residual_block(x, filters, kernel_size, strides, dropout_rate, grow=True, pool=False):
         if grow:
@@ -24,7 +24,7 @@ def ResNet(inputs, class_num=4):
         x = tf.layers.dropout(x, rate=dropout_rate)
         x = tf.layers.conv1d(inputs=x, filters=filters, kernel_size=kernel_size, padding='SAME', strides=strides)
 
-        if grow:
+        if p:
             short_cut = tf.layers.max_pooling1d(short_cut, pool_size=pool_size, strides=pool_strides)
             x = tf.layers.max_pooling1d(x, pool_size=pool_size, strides=pool_strides)
         x = x + short_cut
@@ -58,13 +58,13 @@ def ResNet(inputs, class_num=4):
         p = not p
     x = tf.layers.batch_normalization(x)
     x = tf.nn.relu(x)
-    #x = tf.layers.flatten(x)
-    #x = tf.layers.dense(x,units=class_num)
-    x = tf.layers.average_pooling1d(x, pool_size=x.get_shape().as_list()[1],strides=1)
     x = tf.layers.flatten(x)
-    print(x.shape)
     x = tf.layers.dense(x,units=class_num)
+    #x = tf.layers.average_pooling1d(x, pool_size=x.get_shape().as_list()[1],strides=1)
+    #x = tf.layers.flatten(x)
     print(x.shape)
+    #x = tf.layers.dense(x,units=class_num)
+    #print(x.shape)
     return x
 
     

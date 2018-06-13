@@ -24,12 +24,13 @@ def to_one_hot(y, class_num=4):
         return y_onehot
     elif isinstance(y, np.ndarray):
         y_onehot = np.zeros((y.shape[0],class_num))
-        y_onehot[:, y] = 1
+        for i in range(y.shape[0]):
+            y_onehot[i, y[i]] = 1
         return y_onehot
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--learning_rate',type=float,default=0.0000000001,help='learning rate')
-parser.add_argument('--epochs',type=int,default=3000,help='epoch number')
+parser.add_argument('--learning_rate',type=float,default=0.00000001,help='learning rate')
+parser.add_argument('--epochs',type=int,default=30000,help='epoch number')
 parser.add_argument('--ckpt',type=str,default='checkpoints/model',help='epoch number')
 parser.add_argument('--batch_size',type=int,default=16,help='batch size')
 args = parser.parse_args()
@@ -40,7 +41,7 @@ training_set = loadmat('train.mat')
 X = training_set['data'][0]
 y = training_set['label'][0].astype('int32')
 
-cut_size = 300*30
+cut_size = 300
 X = cut_and_pad(X, cut_size)
 
 
@@ -52,6 +53,7 @@ X = X[valid_n:]
 y = y[valid_n:]
 
 y_onehot = to_one_hot(y)
+#print(y_onehot)
 
 #import matplotlib.pyplot as plt
 #plt.plot(range(cut_size),X[0])
@@ -117,7 +119,7 @@ for ep in range(epochs+1):
             predicts  = np.argmax(res[0],axis=1)
             if predicts!= valid_y[i]:
                 err+=1
-        print("[!] %d validation data, accuracy = %s"%(valid_n, (valid_n-err)/valid_n))
+        print("[!] %d validation data, accuracy = %f"%(valid_n, (valid_n-err)/valid_n))
 
 
     
