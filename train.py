@@ -114,12 +114,22 @@ for ep in range(epochs+1):
     # validation
     if ep%5==0: #and ep!=0:
         err = 0
+        n = np.zeros(class_num);
+        N = np.zeros(class_num);
+        correct = np.zeros(class_num);
         for i in range(valid_n):
             res = sess.run([logits], {data_input: valid_X[i].reshape(-1, cut_size,1)})
+            n[predicts] = n[predicts] + 1   
+            N[valid_y[i]] = N[valid_y[i]] + 1
             predicts  = np.argmax(res[0],axis=1)
             if predicts!= valid_y[i]:
                 err+=1
+            else:
+                correct[predicts] = correct[predicts] + 1
         print("[!] %d validation data, accuracy = %f"%(valid_n, (valid_n-err)/valid_n))
+        res = 2.0 * correct / (N + n)
+        print "[!] Normal = %f, Af = %f, Other = %f, Noisy = %f" % (res[0], res[1], res[2], res[3])
+        print "[!] F1 accuracy = %f" % np.mean(2.0 * correct / (N + n))
 
 
     
