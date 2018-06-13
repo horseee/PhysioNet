@@ -29,7 +29,7 @@ def to_one_hot(y, class_num=4):
         return y_onehot
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--learning_rate',type=float,default=0.00000001,help='learning rate')
+parser.add_argument('--learning_rate',type=float,default=0.000001,help='learning rate')
 parser.add_argument('--epochs',type=int,default=30000,help='epoch number')
 parser.add_argument('--ckpt',type=str,default='checkpoints/model',help='epoch number')
 parser.add_argument('--batch_size',type=int,default=16,help='batch size')
@@ -41,7 +41,7 @@ training_set = loadmat('train.mat')
 X = training_set['data'][0]
 y = training_set['label'][0].astype('int32')
 
-cut_size = 300
+cut_size = 300*30
 X = cut_and_pad(X, cut_size)
 
 
@@ -119,17 +119,17 @@ for ep in range(epochs+1):
         correct = np.zeros(class_num);
         for i in range(valid_n):
             res = sess.run([logits], {data_input: valid_X[i].reshape(-1, cut_size,1)})
+            predicts  = np.argmax(res[0],axis=1)
             n[predicts] = n[predicts] + 1   
             N[valid_y[i]] = N[valid_y[i]] + 1
-            predicts  = np.argmax(res[0],axis=1)
             if predicts!= valid_y[i]:
                 err+=1
             else:
                 correct[predicts] = correct[predicts] + 1
         print("[!] %d validation data, accuracy = %f"%(valid_n, (valid_n-err)/valid_n))
         res = 2.0 * correct / (N + n)
-        print "[!] Normal = %f, Af = %f, Other = %f, Noisy = %f" % (res[0], res[1], res[2], res[3])
-        print "[!] F1 accuracy = %f" % np.mean(2.0 * correct / (N + n))
+        print("[!] Normal = %f, Af = %f, Other = %f, Noisy = %f" % (res[0], res[1], res[2], res[3]))
+        print("[!] F1 accuracy = %f" % np.mean(2.0 * correct / (N + n)))
 
 
     
