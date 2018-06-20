@@ -15,7 +15,6 @@ def load_physionet(dir_path, test=0.2,vali=0, shuffle=True):
     test_y = None
     valid_X = None
     valid_y = None
-    data_n = ref.shape[0]
     
     for index, row in ref.iterrows():
         file_prefix = row[0]
@@ -28,9 +27,12 @@ def load_physionet(dir_path, test=0.2,vali=0, shuffle=True):
         data = data-np.mean(data)
         data = data/np.std(data)
 
+        
         X.append( data )
         y.append( label_id[row[1]] )
-        
+    data_n = len(y)
+    print(data_n)
+
     X = np.array(X)
     y = np.array(y)
         

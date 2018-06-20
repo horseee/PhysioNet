@@ -58,7 +58,7 @@ def ResNet(inputs, class_num=4):
         p = not p
     x = tf.layers.batch_normalization(x)
     x = tf.nn.relu(x)
-    x = tf.layers.flatten(x)
+    x = tf.contrib.layers.flatten(x)
     x = tf.layers.dense(x,units=class_num)
     #x = tf.layers.average_pooling1d(x, pool_size=x.get_shape().as_list()[1],strides=1)
     #x = tf.layers.flatten(x)
